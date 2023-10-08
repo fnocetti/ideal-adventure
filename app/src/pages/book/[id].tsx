@@ -13,6 +13,7 @@ import { QueryClient, dehydrate, useQuery } from "react-query";
 import { useRouter } from "next/router";
 import { AppLayout } from "@/components/AppLayout";
 import { getBook } from "@/api/books";
+import { SubjectsChips } from "@/components/bookDetails/SubjectsChips";
 
 export const getServerSideProps = (async (context) => {
   const bookId = parseInt(context.query.id as string);
@@ -39,14 +40,6 @@ export default function BookDetailsPage() {
 
   if (!data) return "no data";
 
-  const subjects: JSX.Element[] = [];
-  const uniqueSubjects = new Set(
-    data.subjects.flatMap((subject) => subject.split(" -- "))
-  );
-  uniqueSubjects.forEach((subject) => {
-    subjects.push(<Chip key={subject} label={subject} />);
-  });
-
   return (
     <>
       <Head>
@@ -65,7 +58,7 @@ export default function BookDetailsPage() {
           />
           <Stack>
             <Stack direction="row" useFlexGap flexWrap="wrap" spacing={1}>
-              {subjects}
+              <SubjectsChips subjects={data.subjects} />
             </Stack>
             <Typography sx={{ pt: 2 }} variant="h6">
               Author{data.authors.length > 1 ? "s" : ""}
