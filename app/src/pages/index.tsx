@@ -57,6 +57,9 @@ export default function BooksLibraryPage({}: BooksLibraryPageProps) {
   if (!data) return "loading";
 
   const { pages } = data;
+  const books = pages.flatMap((page) => page.results);
+  const count = pages.reduce((count, page) => count + page.results.length, 0);
+  const total = pages[pages.length - 1].count;
 
   return (
     <>
@@ -65,9 +68,9 @@ export default function BooksLibraryPage({}: BooksLibraryPageProps) {
       </Head>
       <AppLayout>
         <Box textAlign="center">
-          <BooksCount pages={pages} />
-          <BooksList pages={pages} />
-          <BooksCount pages={pages} />
+          <BooksCount count={count} total={total} />
+          <BooksList books={books} />
+          <BooksCount count={count} total={total} />
           <LoadMoreButton
             isFetching={isFetchingNextPage}
             onLoadMore={() => fetchNextPage()}
