@@ -13,33 +13,52 @@ import {
 import Head from "next/head";
 import type {
   GetServerSideProps,
-  InferGetServerSidePropsType,
 } from "next/types";
 import LocalLibraryIcon from "@mui/icons-material/LocalLibrary";
-import books from '../../books.json';
+import { QueryClient, dehydrate, useQuery } from "react-query";
+import { useRouter } from 'next/router';
+import axios from "axios";
+import books from "../../books.json";
 
-export const getServerSideProps = (async () => {
-  const book = books.results[0];
+async function getBook(bookId: number) {
+  const response = await axios.get<typeof books['results'][number]>(
+   `https://gutendex.com/books/${bookId}`
+  );
+  return response.data;
+}
+
+export const getServerSideProps = (async (context) => {
+  const bookId = parseInt(context.query.id as string);
+  const queryClient = new QueryClient();
+
+  await queryClient.prefetchQuery(['book', bookId], async () => getBook(bookId));
 
   return {
     props: {
-      book,
+      dehydratedState: dehydrate(queryClient),
     },
   };
 }) satisfies GetServerSideProps;
 
-export default function BookDetailsPage({
-  book,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function BookDetailsPage() {
+  const router = useRouter();
+  const bookId = parseInt(router.query.id as string)
+  const { data } = useQuery({ queryKey: ['book', bookId], queryFn: async () => getBook(bookId)})
+
+  if (!data) return "no data";
+
   const subjects: JSX.Element[] = [];
-  const uniqueSubjects = new Set(book.subjects.flatMap(subject => subject.split(' -- ')));
-  uniqueSubjects.forEach(subject => {
-    subjects.push(<Chip key={subject} label={subject} />)
-  })
+  const uniqueSubjects = new Set(
+    data.subjects.flatMap((subject) => subject.split(" -- "))
+  );
+  uniqueSubjects.forEach((subject) => {
+    subjects.push(<Chip key={subject} label={subject} />);
+  });
+
   return (
     <>
       <Head>
-        <title>GutendexApp - Library - {book.title}</title>
+        <title>GutendexApp - Library - {data.title}</title>
       </Head>
       <AppBar position="relative">
         <Toolbar>
@@ -49,12 +68,12 @@ export default function BookDetailsPage({
       </AppBar>
       <main>
         <Container maxWidth="md">
-          <Typography>#{book.id}</Typography>
-          <Typography variant="h1">{book.title}</Typography>
-          <Stack direction='row' alignItems='flex-start' spacing={2}>
+          <Typography>#{data.id}</Typography>
+          <Typography variant="h1">{data.title}</Typography>
+          <Stack direction="row" alignItems="flex-start" spacing={2}>
             <Box
               component="img"
-              src="https://www.gutenberg.org/cache/epub/1513/pg1513.cover.medium.jpg"
+              src={data.formats['image/jpeg']}
               sx={{
                 maxWidth: { lg: "38%" },
               }}
@@ -63,25 +82,39 @@ export default function BookDetailsPage({
               <Stack direction="row" useFlexGap flexWrap="wrap" spacing={1}>
                 {subjects}
               </Stack>
-              <Typography sx={{ pt: 2 }} variant='h6'>Author{book.authors.length > 1 ? 's' : ''}</Typography>
+              <Typography sx={{ pt: 2 }} variant="h6">
+                Author{data.authors.length > 1 ? "s" : ""}
+              </Typography>
               <List sx={{ pt: 0 }}>
-                {
-                  book.authors.map(author => (
-                    <ListItem key={author.name}>
-                      <ListItemText primary={author.name} secondary={`${author.birth_year} - ${author.death_year}`} />
-                    </ListItem>
-                  ))
-                }
+                {data.authors.length ? data.authors.map((author) => (
+                  <ListItem key={author.name}>
+                    <ListItemText
+                      primary={author.name}
+                      secondary={`${author.birth_year} - ${author.death_year}`}
+                    />
+                  </ListItem>
+                )) : (
+                  <ListItem key='unknown-author'>
+                    <ListItemText primary="Unknown author" />
+                  </ListItem>
+                )}
               </List>
-              <Typography sx={{ pt: 2 }} variant='h6'>Formats</Typography>
+              <Typography sx={{ pt: 2 }} variant="h6">
+                Formats
+              </Typography>
               <List sx={{ pt: 0 }}>
-                {
-                  (Object.keys(book.formats) as (keyof typeof book['formats'])[]).map(format => (
-                    <ListItem key={format}>
-                      <ListItemText primary={format} secondary={book.formats[format]} />
-                    </ListItem>
-                  ))
-                }
+                {(
+                  Object.keys(
+                    data.formats
+                  ) as (keyof (typeof data)["formats"])[]
+                ).map((format) => (
+                  <ListItem key={format}>
+                    <ListItemText
+                      primary={format}
+                      secondary={data.formats[format]}
+                    />
+                  </ListItem>
+                ))}
               </List>
             </Stack>
           </Stack>
