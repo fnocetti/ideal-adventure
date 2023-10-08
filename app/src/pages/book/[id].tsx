@@ -1,20 +1,14 @@
-import {
-  Box,
-  Stack,
-  Typography,
-  List,
-  ListItem,
-  ListItemText,
-} from "@mui/material";
+import { Box, Stack, Typography } from "@mui/material";
 import Head from "next/head";
 import type { GetServerSideProps } from "next/types";
 import { QueryClient, dehydrate, useQuery } from "react-query";
 import { useRouter } from "next/router";
 import { AppLayout } from "@/components/AppLayout";
-import { Format, getBook } from "@/api/books";
+import { getBook } from "@/api/books";
 import { SubjectsChips } from "@/components/bookDetails/SubjectsChips";
 import { DetailsField } from "@/components/bookDetails/DetailsField";
 import { AuthorsList } from "@/components/bookDetails/AuthorsList";
+import { FormatsList } from "@/components/bookDetails/FormatsList";
 
 export const getServerSideProps = (async (context) => {
   const bookId = parseInt(context.query.id as string);
@@ -61,22 +55,11 @@ export default function BookDetailsPage() {
             <Stack direction="row" useFlexGap flexWrap="wrap" spacing={1}>
               <SubjectsChips subjects={data.subjects} />
             </Stack>
-            <DetailsField
-              caption={`Author${data.authors.length > 1 ? "s" : ""}`}
-            >
+            <DetailsField caption="Author">
               <AuthorsList authors={data.authors} />
             </DetailsField>
             <DetailsField caption="Formats">
-              <List sx={{ pt: 0 }}>
-                {(Object.keys(data.formats) as Format[]).map((format) => (
-                  <ListItem key={format}>
-                    <ListItemText
-                      primary={format}
-                      secondary={data.formats[format]}
-                    />
-                  </ListItem>
-                ))}
-              </List>
+              <FormatsList formats={data.formats} />
             </DetailsField>
           </Stack>
         </Stack>
