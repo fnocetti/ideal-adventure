@@ -42,10 +42,11 @@ interface BooksResults {
 }
 
 const HOST = 'https://gutendex.com';
+export const FIRST_PAGE = `${HOST}/books/`;
 
 export async function getBooks(pageUrl?: string) {
   const response = await axios.get<BooksResults>(
-    pageUrl ?? `${HOST}/books/`
+    pageUrl ?? FIRST_PAGE
   );
   return response.data;
 }

@@ -1,17 +1,14 @@
-import {
-  Button,
-  CircularProgress,
-} from "@mui/material";
+import { Button, CircularProgress } from "@mui/material";
 
 interface LoadMoreButtonProps {
-  isFetching: boolean;
+  isLoading: boolean;
   onLoadMore: () => void;
 }
 
-export function LoadMoreButton({ isFetching, onLoadMore }: LoadMoreButtonProps) {
-  if (isFetching) {
-    return <CircularProgress />
+export function LoadMoreButton({ isLoading, onLoadMore }: LoadMoreButtonProps) {
+  if (isLoading) {
+    return <CircularProgress />;
   }
 
-  return <Button onClick={() => onLoadMore()} >Load more books</Button>
+  return <Button onClick={() => onLoadMore()}>Load more books</Button>;
 }
