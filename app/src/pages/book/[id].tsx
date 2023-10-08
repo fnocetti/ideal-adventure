@@ -1,16 +1,16 @@
 import { Box, Stack, Typography } from "@mui/material";
 import Head from "next/head";
 import type { GetServerSideProps } from "next/types";
-import { QueryClient, dehydrate, useQuery } from "react-query";
+import { QueryClient, dehydrate } from "react-query";
 import { useRouter } from "next/router";
 import { AppLayout } from "@/components/AppLayout";
-import { getBook } from "@/api/books";
 import { SubjectsChips } from "@/components/bookDetails/SubjectsChips";
 import { DetailsField } from "@/components/bookDetails/DetailsField";
 import { AuthorsList } from "@/components/bookDetails/AuthorsList";
 import { FormatsList } from "@/components/bookDetails/FormatsList";
 import { useBook } from "@/hooks/useBook";
 import type { ParsedUrlQuery } from "querystring";
+import { getBookQuery } from "@/queries/books";
 
 function extractBookId(query: ParsedUrlQuery) {
   return parseInt(query.id as string);
@@ -20,9 +20,7 @@ export const getServerSideProps = (async (context) => {
   const bookId = extractBookId(context.query);
   const queryClient = new QueryClient();
 
-  await queryClient.prefetchQuery(["book", bookId], async () =>
-    getBook(bookId)
-  );
+  await queryClient.prefetchQuery(getBookQuery(bookId));
 
   return {
     props: {

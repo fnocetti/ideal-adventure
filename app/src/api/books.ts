@@ -34,7 +34,7 @@ export interface Book {
   download_count: number
 }
 
-interface BooksResults {
+export interface BooksResults {
   count: number;
   next: string;
   previous: string;

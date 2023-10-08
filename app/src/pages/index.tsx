@@ -6,19 +6,14 @@ import { AppLayout } from "@/components/AppLayout";
 import { LoadMoreButton } from "@/components/booksList/LoadMoreButton";
 import { BooksList } from "@/components/booksList/BooksList";
 import { BooksCount } from "@/components/booksList/BooksCount";
-import { FIRST_PAGE, getBooks } from "@/api/books";
+import { FIRST_PAGE } from "@/api/books";
 import { useBooksLibrary } from "@/hooks/useBooksLibrary";
+import { getBooksLibraryQuery } from "@/queries/books";
 
 export async function getServerSideProps() {
   const queryClient = new QueryClient();
 
-  await queryClient.prefetchInfiniteQuery(
-    ["books"],
-    async ({ pageParam }) => getBooks(pageParam),
-    {
-      getNextPageParam: (lastPage) => lastPage.next,
-    }
-  );
+  await queryClient.prefetchInfiniteQuery(getBooksLibraryQuery());
 
   const dehydratedState = dehydrate(queryClient);
 

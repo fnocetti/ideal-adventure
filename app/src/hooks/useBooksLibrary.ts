@@ -1,12 +1,9 @@
 import { useInfiniteQuery } from "react-query";
 import { getBooks } from "@/api/books";
+import { getBooksLibraryQuery } from '@/queries/books';
 
 export function useBooksLibrary() {
-  const { data, fetchNextPage, isFetchingNextPage } = useInfiniteQuery({
-    queryKey: ["books"],
-    queryFn: async ({ pageParam }) => getBooks(pageParam),
-    getNextPageParam: (lastPage) => lastPage.next,
-  });
+  const { data, fetchNextPage, isFetchingNextPage } = useInfiniteQuery(getBooksLibraryQuery());
 
   const books = data?.pages.flatMap((page) => page.results) ?? [];
   const count = data?.pages.reduce((count, page) => count + page.results.length, 0) ?? 0;
