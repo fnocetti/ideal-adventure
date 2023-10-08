@@ -1,8 +1,6 @@
 import {
   Avatar,
   Box,
-  Button,
-  CircularProgress,
   Divider,
   List,
   ListItem,
@@ -11,7 +9,6 @@ import {
   ListItemText,
   Typography,
 } from "@mui/material";
-import LocalLibraryIcon from "@mui/icons-material/LocalLibrary";
 import Head from "next/head";
 import books from "../books.json";
 import Link from "next/link";
@@ -20,6 +17,7 @@ import { QueryClient, dehydrate, useInfiniteQuery } from "react-query";
 import axios from "axios";
 import { Fragment } from "react";
 import { AppLayout } from '@/components/AppLayout';
+import { LoadMoreButton } from '@/components/booksList/LoadMoreButton';
 
 async function getBooks({ pageParam }: { pageParam?: string }) {
   const response = await axios.get<typeof books>(
@@ -116,11 +114,7 @@ export default function BooksLibraryPage({}: BooksLibraryPageProps) {
             Showing {count} out of {total} books
           </Typography>
           <Box textAlign='center'>
-            {isFetchingNextPage ? (
-              <CircularProgress />
-            ) : (
-              <Button onClick={() => fetchNextPage()} >Load more books</Button>
-            )}
+            <LoadMoreButton isFetching={isFetchingNextPage} onLoadMore={() => fetchNextPage()} />
           </Box>
         </AppLayout>
     </>
