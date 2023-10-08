@@ -15,7 +15,7 @@ export type Format =
   | "text/plain; charset=iso-8859-1"
   | "text/html; charset=iso-8859-1";
 
-interface Author {
+export interface Author {
   name: string,
   birth_year: number,
   death_year: number

@@ -14,6 +14,7 @@ import { AppLayout } from "@/components/AppLayout";
 import { Format, getBook } from "@/api/books";
 import { SubjectsChips } from "@/components/bookDetails/SubjectsChips";
 import { DetailsField } from "@/components/bookDetails/DetailsField";
+import { AuthorsList } from "@/components/bookDetails/AuthorsList";
 
 export const getServerSideProps = (async (context) => {
   const bookId = parseInt(context.query.id as string);
@@ -63,22 +64,7 @@ export default function BookDetailsPage() {
             <DetailsField
               caption={`Author${data.authors.length > 1 ? "s" : ""}`}
             >
-              <List sx={{ pt: 0 }}>
-                {data.authors.length ? (
-                  data.authors.map((author) => (
-                    <ListItem key={author.name}>
-                      <ListItemText
-                        primary={author.name}
-                        secondary={`${author.birth_year} - ${author.death_year}`}
-                      />
-                    </ListItem>
-                  ))
-                ) : (
-                  <ListItem key="unknown-author">
-                    <ListItemText primary="Unknown author" />
-                  </ListItem>
-                )}
-              </List>
+              <AuthorsList authors={data.authors} />
             </DetailsField>
             <DetailsField caption="Formats">
               <List sx={{ pt: 0 }}>
