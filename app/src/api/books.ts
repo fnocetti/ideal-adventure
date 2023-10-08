@@ -1,6 +1,6 @@
 import axios from "axios";
 
-type Format = 
+export type Format = 
   | "application/x-mobipocket-ebook"
   | "application/epub+zip" 
   | "text/html"

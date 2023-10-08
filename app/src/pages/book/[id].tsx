@@ -2,7 +2,6 @@ import {
   Box,
   Stack,
   Typography,
-  Chip,
   List,
   ListItem,
   ListItemText,
@@ -12,8 +11,9 @@ import type { GetServerSideProps } from "next/types";
 import { QueryClient, dehydrate, useQuery } from "react-query";
 import { useRouter } from "next/router";
 import { AppLayout } from "@/components/AppLayout";
-import { getBook } from "@/api/books";
+import { Format, getBook } from "@/api/books";
 import { SubjectsChips } from "@/components/bookDetails/SubjectsChips";
+import { DetailsField } from "@/components/bookDetails/DetailsField";
 
 export const getServerSideProps = (async (context) => {
   const bookId = parseInt(context.query.id as string);
@@ -60,40 +60,38 @@ export default function BookDetailsPage() {
             <Stack direction="row" useFlexGap flexWrap="wrap" spacing={1}>
               <SubjectsChips subjects={data.subjects} />
             </Stack>
-            <Typography sx={{ pt: 2 }} variant="h6">
-              Author{data.authors.length > 1 ? "s" : ""}
-            </Typography>
-            <List sx={{ pt: 0 }}>
-              {data.authors.length ? (
-                data.authors.map((author) => (
-                  <ListItem key={author.name}>
+            <DetailsField
+              caption={`Author${data.authors.length > 1 ? "s" : ""}`}
+            >
+              <List sx={{ pt: 0 }}>
+                {data.authors.length ? (
+                  data.authors.map((author) => (
+                    <ListItem key={author.name}>
+                      <ListItemText
+                        primary={author.name}
+                        secondary={`${author.birth_year} - ${author.death_year}`}
+                      />
+                    </ListItem>
+                  ))
+                ) : (
+                  <ListItem key="unknown-author">
+                    <ListItemText primary="Unknown author" />
+                  </ListItem>
+                )}
+              </List>
+            </DetailsField>
+            <DetailsField caption="Formats">
+              <List sx={{ pt: 0 }}>
+                {(Object.keys(data.formats) as Format[]).map((format) => (
+                  <ListItem key={format}>
                     <ListItemText
-                      primary={author.name}
-                      secondary={`${author.birth_year} - ${author.death_year}`}
+                      primary={format}
+                      secondary={data.formats[format]}
                     />
                   </ListItem>
-                ))
-              ) : (
-                <ListItem key="unknown-author">
-                  <ListItemText primary="Unknown author" />
-                </ListItem>
-              )}
-            </List>
-            <Typography sx={{ pt: 2 }} variant="h6">
-              Formats
-            </Typography>
-            <List sx={{ pt: 0 }}>
-              {(
-                Object.keys(data.formats) as (keyof (typeof data)["formats"])[]
-              ).map((format) => (
-                <ListItem key={format}>
-                  <ListItemText
-                    primary={format}
-                    secondary={data.formats[format]}
-                  />
-                </ListItem>
-              ))}
-            </List>
+                ))}
+              </List>
+            </DetailsField>
           </Stack>
         </Stack>
       </AppLayout>
