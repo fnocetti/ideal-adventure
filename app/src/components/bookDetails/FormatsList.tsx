@@ -10,7 +10,13 @@ export function FormatsList({ formats }: FormatsListProps) {
   return (
     <List sx={{ pt: 0 }}>
       {formatKeys.map((format) => (
-        <ListItem key={format}>
+        <ListItem
+          key={format}
+          sx={{
+            overflow: "hidden",
+            overflowWrap: "anywhere",
+          }}
+        >
           <ListItemText primary={format} secondary={formats[format]} />
         </ListItem>
       ))}

@@ -44,17 +44,29 @@ export default function BookDetailsPage() {
       </Head>
       <AppLayout>
         <Typography>#{book.id}</Typography>
-        <Typography variant="h1">{book.title}</Typography>
-        <Stack direction="row" alignItems="flex-start" spacing={2}>
+        <Typography variant="h3" component="h1" paddingBottom={2}>
+          {book.title}
+        </Typography>
+        <Stack
+          direction={{ xs: "column", md: "row" }}
+          alignItems={{ xs: "center", md: "flex-start" }}
+          spacing={2}
+        >
           <Box
             component="img"
             src={book.formats["image/jpeg"]}
             sx={{
-              maxWidth: { lg: "38%" },
+              maxWidth: { xs: "80%", md: "38%" },
             }}
           />
           <Stack>
-            <Stack direction="row" useFlexGap flexWrap="wrap" spacing={1}>
+            <Stack
+              direction="row"
+              useFlexGap
+              flexWrap="wrap"
+              spacing={1}
+              paddingTop={2}
+            >
               <SubjectsChips subjects={book.subjects} />
             </Stack>
             <DetailsField caption="Author">
