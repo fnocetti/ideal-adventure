@@ -1,4 +1,4 @@
-import { Box, Typography } from "@mui/material";
+import { Box } from "@mui/material";
 import Head from "next/head";
 import books from "../books.json";
 import { InferGetServerSidePropsType } from "next";
@@ -7,6 +7,7 @@ import axios from "axios";
 import { AppLayout } from "@/components/AppLayout";
 import { LoadMoreButton } from "@/components/booksList/LoadMoreButton";
 import { BooksList } from "@/components/booksList/BooksList";
+import { BooksCount } from "@/components/booksList/BooksCount";
 
 async function getBooks({ pageParam }: { pageParam?: string }) {
   const response = await axios.get<typeof books>(
@@ -57,23 +58,16 @@ export default function BooksLibraryPage({}: BooksLibraryPageProps) {
 
   const { pages } = data;
 
-  const count = pages.reduce((count, page) => count + page.results.length, 0);
-  const total = pages[pages.length - 1].count;
-
   return (
     <>
       <Head>
         <title>GutendexApp - Library</title>
       </Head>
       <AppLayout>
-        <Typography textAlign="center">
-          Showing {count} out of {total} books
-        </Typography>
-        <BooksList pages={pages} />
-        <Typography textAlign="center">
-          Showing {count} out of {total} books
-        </Typography>
         <Box textAlign="center">
+          <BooksCount pages={pages} />
+          <BooksList pages={pages} />
+          <BooksCount pages={pages} />
           <LoadMoreButton
             isFetching={isFetchingNextPage}
             onLoadMore={() => fetchNextPage()}
