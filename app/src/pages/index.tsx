@@ -2,6 +2,7 @@ import {
   AppBar,
   Avatar,
   Button,
+  CircularProgress,
   Container,
   Divider,
   List,
@@ -55,7 +56,7 @@ type BooksLibraryPageProps = InferGetServerSidePropsType<
 >;
 
 export default function BooksLibraryPage({}: BooksLibraryPageProps) {
-  const { data, fetchNextPage } = useInfiniteQuery({ queryKey: ['books'], queryFn: getBooks, getNextPageParam: lastPage => lastPage.next });
+  const { data, fetchNextPage, isFetchingNextPage } = useInfiniteQuery({ queryKey: ['books'], queryFn: getBooks, getNextPageParam: lastPage => lastPage.next });
 
   if(!data) return null;
 
@@ -111,7 +112,7 @@ export default function BooksLibraryPage({}: BooksLibraryPageProps) {
           <Typography>
             Showing {count} out of {total} books
           </Typography>
-          <Button onClick={() => fetchNextPage()}>Load more books</Button>
+          {isFetchingNextPage ? <CircularProgress /> : <Button onClick={() => fetchNextPage()}>Load more books</Button>}
         </Container>
       </main>
     </>
