@@ -13,7 +13,9 @@ export function AuthorsList({ authors }: AuthorsListProps) {
           <ListItem key={author.name}>
             <ListItemText
               primary={author.name}
-              secondary={`${author.birth_year} - ${author.death_year}`}
+              secondary={`${author.birth_year ?? "Unknown"} - ${
+                author.death_year ?? "Unknown"
+              }`}
             />
           </ListItem>
         ))
