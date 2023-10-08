@@ -9,10 +9,10 @@ import {
   ListItemText,
 } from "@mui/material";
 import Link from "next/link";
-import books from "../../books.json";
+import { Book } from "@/api/books";
 
 interface BooksListProps {
-  books: (typeof books)["results"];
+  books: Book[];
 }
 
 export function BooksList({ books }: BooksListProps) {
