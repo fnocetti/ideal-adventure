@@ -1,27 +1,23 @@
 import { Box } from "@mui/material";
 import Head from "next/head";
-import books from "../books.json";
 import { InferGetServerSidePropsType } from "next";
 import { QueryClient, dehydrate, useInfiniteQuery } from "react-query";
-import axios from "axios";
 import { AppLayout } from "@/components/AppLayout";
 import { LoadMoreButton } from "@/components/booksList/LoadMoreButton";
 import { BooksList } from "@/components/booksList/BooksList";
 import { BooksCount } from "@/components/booksList/BooksCount";
-
-async function getBooks({ pageParam }: { pageParam?: string }) {
-  const response = await axios.get<typeof books>(
-    pageParam ?? "https://gutendex.com/books/"
-  );
-  return response.data;
-}
+import { getBooks } from "@/api/books";
 
 export async function getServerSideProps() {
   const queryClient = new QueryClient();
 
-  await queryClient.prefetchInfiniteQuery(["books"], getBooks, {
-    getNextPageParam: (lastPage) => lastPage.next,
-  });
+  await queryClient.prefetchInfiniteQuery(
+    ["books"],
+    async ({ pageParam }) => getBooks(pageParam),
+    {
+      getNextPageParam: (lastPage) => lastPage.next,
+    }
+  );
 
   const dehydratedState = dehydrate(queryClient);
 
@@ -50,7 +46,7 @@ type BooksLibraryPageProps = InferGetServerSidePropsType<
 export default function BooksLibraryPage({}: BooksLibraryPageProps) {
   const { data, fetchNextPage, isFetchingNextPage } = useInfiniteQuery({
     queryKey: ["books"],
-    queryFn: getBooks,
+    queryFn: async ({ pageParam }) => getBooks(pageParam),
     getNextPageParam: (lastPage) => lastPage.next,
   });
 
