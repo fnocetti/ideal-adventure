@@ -17,7 +17,7 @@ import Head from "next/head";
 import books from "../books.json";
 import Link from "next/link";
 import { InferGetServerSidePropsType } from "next";
-import { QueryClient, dehydrate, useQuery } from 'react-query';
+import { QueryClient, dehydrate, useInfiniteQuery } from 'react-query';
 import axios from 'axios';
 
 async function getBooks() {
@@ -28,7 +28,9 @@ async function getBooks() {
 export async function getServerSideProps() {
   const queryClient = new QueryClient();
 
-  await queryClient.prefetchQuery(['books'], getBooks)
+  await queryClient.prefetchInfiniteQuery(['books'], getBooks, {
+    getNextPageParam: lastPage => lastPage.next || null,
+  })
 
   return {
     props: {
@@ -42,11 +44,15 @@ type BooksLibraryPageProps = InferGetServerSidePropsType<
 >;
 
 export default function BooksLibraryPage({}: BooksLibraryPageProps) {
-  const { data } = useQuery({ queryKey: ['books'], queryFn: getBooks });
+  const { data } = useInfiniteQuery({ queryKey: ['books'], queryFn: getBooks, getNextPageParam: lastPage => lastPage.next });
 
   if(!data) return null;
 
-  const { results, count } = data;
+  const { pages } = data;
+
+  const count = pages.reduce((count, page) => count + page.results.length, 0);
+  const total = pages[pages.length - 1].count;
+
   return (
     <>
       <Head>
@@ -61,10 +67,11 @@ export default function BooksLibraryPage({}: BooksLibraryPageProps) {
       <main>
         <Container maxWidth="md" sx={{ textAlign: "center" }}>
           <Typography>
-            Showing {results.length} out of {count} books
+            Showing {count} out of {total} books
           </Typography>
+          <Divider />
           <List>
-            {results.map((book, index, allBooks) => (
+            {pages.flatMap(page => page.results).map((book) => (
               <>
                 <ListItem key={book.id} alignItems="flex-start">
                   <ListItemButton
@@ -86,12 +93,12 @@ export default function BooksLibraryPage({}: BooksLibraryPageProps) {
                     />
                   </ListItemButton>
                 </ListItem>
-                {index < allBooks.length - 1 ? <Divider /> : null}
+                <Divider />
               </>
             ))}
           </List>
           <Typography>
-            Showing {results.length} out of {count} books
+            Showing {count} out of {total} books
           </Typography>
           <Button>Load more books</Button>
         </Container>
