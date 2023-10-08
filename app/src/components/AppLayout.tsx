@@ -1,4 +1,4 @@
-import { AppBar, Container, Toolbar, Typography } from "@mui/material";
+import { AppBar, Box, Container, Toolbar, Typography } from "@mui/material";
 import LocalLibraryIcon from "@mui/icons-material/LocalLibrary";
 
 interface AppLayoutProps {
@@ -14,11 +14,9 @@ export function AppLayout({ children }: AppLayoutProps) {
           <Typography variant="h5"> GutendexApp</Typography>
         </Toolbar>
       </AppBar>
-      <main>
-        <Container maxWidth="md">
-          {children}
-        </Container>
-      </main>
+      <Box component="main" sx={{ py: 4 }}>
+        <Container maxWidth="md">{children}</Container>
+      </Box>
     </>
   );
 }
