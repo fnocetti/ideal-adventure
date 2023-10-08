@@ -1,16 +1,14 @@
 import {
-  AppBar,
   Avatar,
+  Box,
   Button,
   CircularProgress,
-  Container,
   Divider,
   List,
   ListItem,
   ListItemAvatar,
   ListItemButton,
   ListItemText,
-  Toolbar,
   Typography,
 } from "@mui/material";
 import LocalLibraryIcon from "@mui/icons-material/LocalLibrary";
@@ -21,6 +19,7 @@ import { InferGetServerSidePropsType } from "next";
 import { QueryClient, dehydrate, useInfiniteQuery } from "react-query";
 import axios from "axios";
 import { Fragment } from "react";
+import { AppLayout } from '@/components/AppLayout';
 
 async function getBooks({ pageParam }: { pageParam?: string }) {
   const response = await axios.get<typeof books>(
@@ -79,15 +78,8 @@ export default function BooksLibraryPage({}: BooksLibraryPageProps) {
       <Head>
         <title>GutendexApp - Library</title>
       </Head>
-      <AppBar position="relative">
-        <Toolbar>
-          <LocalLibraryIcon sx={{ mr: 2 }} />
-          <Typography variant="h5"> GutendexApp</Typography>
-        </Toolbar>
-      </AppBar>
-      <main>
-        <Container maxWidth="md" sx={{ textAlign: "center" }}>
-          <Typography>
+      <AppLayout>
+          <Typography textAlign='center'>
             Showing {count} out of {total} books
           </Typography>
           <Divider />
@@ -120,16 +112,17 @@ export default function BooksLibraryPage({}: BooksLibraryPageProps) {
                 </Fragment>
               ))}
           </List>
-          <Typography>
+          <Typography textAlign='center'>
             Showing {count} out of {total} books
           </Typography>
-          {isFetchingNextPage ? (
-            <CircularProgress />
-          ) : (
-            <Button onClick={() => fetchNextPage()}>Load more books</Button>
-          )}
-        </Container>
-      </main>
+          <Box textAlign='center'>
+            {isFetchingNextPage ? (
+              <CircularProgress />
+            ) : (
+              <Button onClick={() => fetchNextPage()} >Load more books</Button>
+            )}
+          </Box>
+        </AppLayout>
     </>
   );
 }

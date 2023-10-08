@@ -19,6 +19,7 @@ import { QueryClient, dehydrate, useQuery } from "react-query";
 import { useRouter } from 'next/router';
 import axios from "axios";
 import books from "../../books.json";
+import { AppLayout } from '@/components/AppLayout';
 
 async function getBook(bookId: number) {
   const response = await axios.get<typeof books['results'][number]>(
@@ -60,14 +61,7 @@ export default function BookDetailsPage() {
       <Head>
         <title>GutendexApp - Library - {data.title}</title>
       </Head>
-      <AppBar position="relative">
-        <Toolbar>
-          <LocalLibraryIcon sx={{ mr: 2 }} />
-          <Typography variant="h5"> GutendexApp</Typography>
-        </Toolbar>
-      </AppBar>
-      <main>
-        <Container maxWidth="md">
+      <AppLayout>
           <Typography>#{data.id}</Typography>
           <Typography variant="h1">{data.title}</Typography>
           <Stack direction="row" alignItems="flex-start" spacing={2}>
@@ -118,8 +112,7 @@ export default function BookDetailsPage() {
               </List>
             </Stack>
           </Stack>
-        </Container>
-      </main>
+        </AppLayout>
     </>
   );
 }
