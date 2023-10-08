@@ -9,9 +9,15 @@ import { SubjectsChips } from "@/components/bookDetails/SubjectsChips";
 import { DetailsField } from "@/components/bookDetails/DetailsField";
 import { AuthorsList } from "@/components/bookDetails/AuthorsList";
 import { FormatsList } from "@/components/bookDetails/FormatsList";
+import { useBook } from "@/hooks/useBook";
+import type { ParsedUrlQuery } from "querystring";
+
+function extractBookId(query: ParsedUrlQuery) {
+  return parseInt(query.id as string);
+}
 
 export const getServerSideProps = (async (context) => {
-  const bookId = parseInt(context.query.id as string);
+  const bookId = extractBookId(context.query);
   const queryClient = new QueryClient();
 
   await queryClient.prefetchQuery(["book", bookId], async () =>
@@ -27,39 +33,35 @@ export const getServerSideProps = (async (context) => {
 
 export default function BookDetailsPage() {
   const router = useRouter();
-  const bookId = parseInt(router.query.id as string);
-  const { data } = useQuery({
-    queryKey: ["book", bookId],
-    queryFn: async () => getBook(bookId),
-  });
+  const { book } = useBook(extractBookId(router.query));
 
-  if (!data) return "no data";
+  if (!book) return "no data";
 
   return (
     <>
       <Head>
-        <title>GutendexApp - Library - {data.title}</title>
+        <title>GutendexApp - Library - {book.title}</title>
       </Head>
       <AppLayout>
-        <Typography>#{data.id}</Typography>
-        <Typography variant="h1">{data.title}</Typography>
+        <Typography>#{book.id}</Typography>
+        <Typography variant="h1">{book.title}</Typography>
         <Stack direction="row" alignItems="flex-start" spacing={2}>
           <Box
             component="img"
-            src={data.formats["image/jpeg"]}
+            src={book.formats["image/jpeg"]}
             sx={{
               maxWidth: { lg: "38%" },
             }}
           />
           <Stack>
             <Stack direction="row" useFlexGap flexWrap="wrap" spacing={1}>
-              <SubjectsChips subjects={data.subjects} />
+              <SubjectsChips subjects={book.subjects} />
             </Stack>
             <DetailsField caption="Author">
-              <AuthorsList authors={data.authors} />
+              <AuthorsList authors={book.authors} />
             </DetailsField>
             <DetailsField caption="Formats">
-              <FormatsList formats={data.formats} />
+              <FormatsList formats={book.formats} />
             </DetailsField>
           </Stack>
         </Stack>
