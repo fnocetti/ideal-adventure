@@ -18,10 +18,10 @@ interface BooksListProps {
 export function BooksList({ books }: BooksListProps) {
   return (
     <>
-      <Divider />
       <List>
-        {books.map((book) => (
+        {books.map((book, index) => (
           <Fragment key={book.id}>
+            {index === 0 ? <Divider /> : null}
             <ListItem alignItems="flex-start">
               <ListItemButton href={`/book/${book.id}`} LinkComponent={Link}>
                 <ListItemAvatar>
