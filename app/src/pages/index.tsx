@@ -18,9 +18,11 @@ import books from "../books.json";
 import Link from "next/link";
 import { InferGetServerSidePropsType } from "next";
 import { QueryClient, dehydrate, useQuery } from 'react-query';
+import axios from 'axios';
 
 async function getBooks() {
-  return books;
+  const response = await axios.get<typeof books>('http://gutendex.com/books');
+  return response.data;
 }
 
 export async function getServerSideProps() {
