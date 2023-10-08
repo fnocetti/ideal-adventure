@@ -17,13 +17,21 @@ import Head from "next/head";
 import books from "../books.json";
 import Link from "next/link";
 import { InferGetServerSidePropsType } from "next";
+import { QueryClient, dehydrate, useQuery } from 'react-query';
+
+async function getBooks() {
+  return books;
+}
 
 export async function getServerSideProps() {
+  const queryClient = new QueryClient();
+
+  await queryClient.prefetchQuery(['books'], getBooks)
+
   return {
     props: {
-      books: books.results,
-      count: books.count,
-    },
+      dehydratedState: dehydrate(queryClient),
+    }
   };
 }
 
@@ -31,10 +39,12 @@ type BooksLibraryPageProps = InferGetServerSidePropsType<
   typeof getServerSideProps
 >;
 
-export default function BooksLibraryPage({
-  books,
-  count,
-}: BooksLibraryPageProps) {
+export default function BooksLibraryPage({}: BooksLibraryPageProps) {
+  const { data } = useQuery({ queryKey: ['books'], queryFn: getBooks });
+
+  if(!data) return null;
+
+  const { results, count } = data;
   return (
     <>
       <Head>
@@ -49,10 +59,10 @@ export default function BooksLibraryPage({
       <main>
         <Container maxWidth="md" sx={{ textAlign: "center" }}>
           <Typography>
-            Showing {books.length} out of {count} books
+            Showing {results.length} out of {count} books
           </Typography>
           <List>
-            {books.map((book, index, allBooks) => (
+            {results.map((book, index, allBooks) => (
               <>
                 <ListItem key={book.id} alignItems="flex-start">
                   <ListItemButton
@@ -79,7 +89,7 @@ export default function BooksLibraryPage({
             ))}
           </List>
           <Typography>
-            Showing {books.length} out of {count} books
+            Showing {results.length} out of {count} books
           </Typography>
           <Button>Load more books</Button>
         </Container>
