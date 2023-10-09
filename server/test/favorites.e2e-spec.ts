@@ -42,5 +42,10 @@ describe('AppController (e2e)', () => {
 
       expect(response.body).toEqual(dummyStore[0]);
     });
+
+    it('should return 404 if the favorite does not exist', () => {
+      dummyStore.push({ bookId: 10 });
+      return request(app.getHttpServer()).get('/favorites/1').expect(404);
+    });
   });
 });

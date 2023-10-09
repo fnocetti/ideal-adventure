@@ -2,6 +2,8 @@ import {
   Body,
   Controller,
   Get,
+  HttpException,
+  HttpStatus,
   Param,
   ParseIntPipe,
   Post,
@@ -19,7 +21,11 @@ export function resetDummyStore() {
 export class FavoritesController {
   @Get(':bookId')
   async getFavorite(@Param('bookId', ParseIntPipe) bookId: number) {
-    return dummyStore.find((favorite) => favorite.bookId === bookId);
+    const favorite = dummyStore.find((f) => f.bookId === bookId);
+    if (!favorite) {
+      throw new HttpException('Not found', HttpStatus.NOT_FOUND);
+    }
+    return favorite;
   }
 
   @Post()
