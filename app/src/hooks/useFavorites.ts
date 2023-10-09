@@ -1,5 +1,5 @@
 import { addToFavorites } from "@/api/favorites";
-import { getIsFavoriteQuery } from "@/queries/favorites";
+import { getIsFavoriteQueryForClient } from "@/queries/favorites";
 import { useMutation, useQuery } from "react-query";
 
 export function useFavorites(bookId: number) {
@@ -8,7 +8,7 @@ export function useFavorites(bookId: number) {
   });
 
   const { data: isFavoriteResult } = useQuery(
-    getIsFavoriteQuery(bookId, "client")
+    getIsFavoriteQueryForClient(bookId)
   );
 
   return {

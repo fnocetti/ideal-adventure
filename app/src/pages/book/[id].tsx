@@ -13,14 +13,20 @@ import { getBookQuery } from "@/queries/books";
 import { AddToFavoritesButton } from "@/components/bookDetails/AddToFavoritesButton";
 import { useFavorites } from "@/hooks/useFavorites";
 import { extractBookId } from "@/helpers/extractBookId";
-import { getIsFavoriteQuery } from "@/queries/favorites";
+import { getIsFavoriteQueryForServer } from "@/queries/favorites";
+import { getCookie, setCookie } from "cookies-next";
 
-export const getServerSideProps = (async (context) => {
-  const bookId = extractBookId(context.query);
+export const getServerSideProps = (async ({ query, req, res }) => {
+  const bookId = extractBookId(query);
+  let user = getCookie("session-cookie", { req, res });
+  if (!user) {
+    user = `${Math.random() * 10000}`;
+    setCookie("session-cookie", user, { req, res, httpOnly: true });
+  }
   const queryClient = new QueryClient();
 
   await queryClient.prefetchQuery(getBookQuery(bookId));
-  await queryClient.prefetchQuery(getIsFavoriteQuery(bookId, "server"));
+  await queryClient.prefetchQuery(getIsFavoriteQueryForServer(bookId, user));
 
   return {
     props: {

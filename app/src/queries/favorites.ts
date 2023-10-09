@@ -2,13 +2,14 @@ import { isFavorite } from "@/api/favorites";
 import { fetchFavorite } from "@/api/favoritesService";
 import { UseQueryOptions } from "react-query";
 
-const fnFor = {
-  client: isFavorite,
-  server: fetchFavorite,
-};
-
-export const getIsFavoriteQuery = (bookId: number, side: keyof typeof fnFor) =>
+const buildQuery = (bookId: number, queryFn: () => Promise<boolean>) =>
   ({
     queryKey: ["isFavorite", bookId],
-    queryFn: async () => fnFor[side](bookId),
+    queryFn,
   } satisfies UseQueryOptions<boolean, unknown>);
+
+export const getIsFavoriteQueryForServer = (bookId: number, user: string) =>
+  buildQuery(bookId, async () => fetchFavorite(bookId, user));
+
+export const getIsFavoriteQueryForClient = (bookId: number) =>
+  buildQuery(bookId, async () => isFavorite(bookId));

@@ -2,14 +2,26 @@ import axios from "axios";
 
 const FAVORITES_SERVIVE = "http://localhost:3004/favorites";
 
-export function postAddToFavorites(bookId: number) {
-  return axios.post(FAVORITES_SERVIVE, { bookId });
+export function postAddToFavorites(bookId: number, userToken: string) {
+  return axios.post(
+    FAVORITES_SERVIVE,
+    { bookId },
+    {
+      headers: {
+        Authorization: userToken,
+      },
+    }
+  );
 }
 
-export async function fetchFavorite(bookId: number) {
+export async function fetchFavorite(bookId: number, userToken: string) {
   return new Promise<boolean>((resolve, reject) => {
     axios
-      .get(`${FAVORITES_SERVIVE}/${bookId}`)
+      .get(`${FAVORITES_SERVIVE}/${bookId}`, {
+        headers: {
+          Authorization: userToken,
+        },
+      })
       .then((response) => {
         resolve(response.status === 200);
       })
