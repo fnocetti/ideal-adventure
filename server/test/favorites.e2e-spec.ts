@@ -15,10 +15,14 @@ describe('AppController (e2e)', () => {
     await app.init();
   });
 
-  it('/ (GET)', () => {
-    return request(app.getHttpServer())
-      .get('/')
-      .expect(200)
-      .expect('Hello World!');
+  describe('Add favorite', () => {
+    it('Add favorite', () => {
+      return request(app.getHttpServer())
+        .post('/favorites')
+        .send({
+          bookId: 1,
+        })
+        .expect(201);
+    });
   });
 });

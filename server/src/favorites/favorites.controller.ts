@@ -1,4 +1,9 @@
-import { Controller } from '@nestjs/common';
+import { Controller, Post } from '@nestjs/common';
 
 @Controller('favorites')
-export class FavoritesController {}
+export class FavoritesController {
+  @Post()
+  async addFavorite() {
+    //
+  }
+}
