@@ -13,17 +13,14 @@ import { getBookQuery } from "@/queries/books";
 import { AddToFavoritesButton } from "@/components/bookDetails/AddToFavoritesButton";
 import { useFavorites } from "@/hooks/useFavorites";
 import { extractBookId } from "@/helpers/extractBookId";
-import { fetchFavorite } from "@/api/favoritesService";
+import { getIsFavoriteQuery } from "@/queries/favorites";
 
 export const getServerSideProps = (async (context) => {
   const bookId = extractBookId(context.query);
   const queryClient = new QueryClient();
 
   await queryClient.prefetchQuery(getBookQuery(bookId));
-  await queryClient.prefetchQuery({
-    queryKey: ["isFavorite", bookId],
-    queryFn: async () => fetchFavorite(bookId),
-  });
+  await queryClient.prefetchQuery(getIsFavoriteQuery(bookId, "server"));
 
   return {
     props: {
