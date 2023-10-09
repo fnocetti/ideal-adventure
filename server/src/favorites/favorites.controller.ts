@@ -2,7 +2,6 @@ import {
   Body,
   Controller,
   Get,
-  Headers,
   HttpException,
   HttpStatus,
   Param,
@@ -11,6 +10,7 @@ import {
 } from '@nestjs/common';
 import { AddFavoriteDto } from './AddFavoriteDto';
 import { FavoritesRepository } from './favorites-repository/favorites-repository';
+import { User } from './../authorization/user/user.decorator';
 
 @Controller('favorites')
 export class FavoritesController {
@@ -19,12 +19,8 @@ export class FavoritesController {
   @Get(':bookId')
   async getFavorite(
     @Param('bookId', ParseIntPipe) bookId: number,
-    @Headers('Authorization') token?: string,
+    @User() token: string,
   ) {
-    if (typeof token === 'undefined') {
-      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
-    }
-
     const favorite = this.favorites.find(token, bookId);
 
     if (!favorite) {
@@ -35,14 +31,7 @@ export class FavoritesController {
   }
 
   @Post()
-  async addFavorite(
-    @Body() favorite: AddFavoriteDto,
-    @Headers('Authorization') token?: string,
-  ) {
-    if (typeof token === 'undefined') {
-      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
-    }
-
+  async addFavorite(@Body() favorite: AddFavoriteDto, @User() token?: string) {
     this.favorites.save(token, favorite.bookId);
   }
 }

@@ -56,6 +56,7 @@ describe('AppController (e2e)', () => {
       async ([prop, value]) => {
         await request(app.getHttpServer())
           .post('/favorites')
+          .set('authorization', 'user1')
           .send({
             [prop]: value,
           })
