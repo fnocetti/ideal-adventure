@@ -31,6 +31,23 @@ describe('AppController (e2e)', () => {
 
       expect(dummyStore).toEqual([{ bookId: 1 }]);
     });
+
+    it.each([
+      ['badProp', 1],
+      ['bookId', 'bad value'],
+    ] as const)(
+      'should return a validation error if the body is not correct',
+      async ([prop, value]) => {
+        await request(app.getHttpServer())
+          .post('/favorites')
+          .send({
+            [prop]: value,
+          })
+          .expect(400);
+
+        expect(dummyStore).toEqual([]);
+      },
+    );
   });
 
   describe('Get favorite', () => {

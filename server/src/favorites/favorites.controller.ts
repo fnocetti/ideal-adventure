@@ -8,6 +8,7 @@ import {
   ParseIntPipe,
   Post,
 } from '@nestjs/common';
+import { AddFavoriteDto } from './AddFavoriteDto';
 
 interface FavoriteDTO {
   bookId: number;
@@ -29,7 +30,7 @@ export class FavoritesController {
   }
 
   @Post()
-  async addFavorite(@Body() favorite: FavoriteDTO) {
+  async addFavorite(@Body() favorite: AddFavoriteDto) {
     dummyStore.push(favorite);
   }
 }
