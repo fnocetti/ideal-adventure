@@ -10,18 +10,12 @@ import {
   Post,
 } from '@nestjs/common';
 import { AddFavoriteDto } from './AddFavoriteDto';
+import { FavoritesRepository } from './favorites-repository/favorites-repository';
 
-interface FavoriteDBO {
-  user: string;
-  bookId: number;
-}
-
-export let dummyStore: FavoriteDBO[] = [];
-export function resetDummyStore() {
-  dummyStore = [];
-}
 @Controller('favorites')
 export class FavoritesController {
+  constructor(private favorites: FavoritesRepository) {}
+
   @Get(':bookId')
   async getFavorite(
     @Param('bookId', ParseIntPipe) bookId: number,
@@ -31,9 +25,7 @@ export class FavoritesController {
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
     }
 
-    const favorite = dummyStore.find(
-      (f) => f.user === token && f.bookId === bookId,
-    );
+    const favorite = this.favorites.find(token, bookId);
 
     if (!favorite) {
       throw new HttpException('Not found', HttpStatus.NOT_FOUND);
@@ -51,6 +43,6 @@ export class FavoritesController {
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
     }
 
-    dummyStore.push({ ...favorite, user: token });
+    this.favorites.save(token, favorite.bookId);
   }
 }

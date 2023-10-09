@@ -3,9 +3,9 @@ import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from './../src/app.module';
 import {
-  dummyStore,
-  resetDummyStore,
-} from './../src/favorites/favorites.controller';
+  memoryStore,
+  resetMemoryStoreStore,
+} from './../src/favorites/favorites-repository/favorites-repository';
 
 describe('AppController (e2e)', () => {
   let app: INestApplication;
@@ -17,7 +17,7 @@ describe('AppController (e2e)', () => {
 
     app = moduleFixture.createNestApplication();
     await app.init();
-    resetDummyStore();
+    resetMemoryStoreStore();
   });
 
   describe('Add favorite', () => {
@@ -30,7 +30,7 @@ describe('AppController (e2e)', () => {
           })
           .expect(401);
 
-        expect(dummyStore).toEqual([]);
+        expect(memoryStore).toEqual([]);
       });
     });
 
@@ -44,7 +44,7 @@ describe('AppController (e2e)', () => {
           })
           .expect(201);
 
-        expect(dummyStore).toEqual([{ user: 'user1', bookId: 1 }]);
+        expect(memoryStore).toEqual([{ user: 'user1', bookId: 1 }]);
       });
     });
 
@@ -61,14 +61,14 @@ describe('AppController (e2e)', () => {
           })
           .expect(400);
 
-        expect(dummyStore).toEqual([]);
+        expect(memoryStore).toEqual([]);
       },
     );
   });
 
   describe('Get favorite', () => {
     it('should get a favorite by book id', async () => {
-      dummyStore.push({ user: 'user1', bookId: 10 });
+      memoryStore.push({ user: 'user1', bookId: 10 });
       const response = await request(app.getHttpServer())
         .get('/favorites/10')
         .set('authorization', 'user1')
@@ -78,7 +78,7 @@ describe('AppController (e2e)', () => {
     });
 
     it('should return 404 if the favorite does not exist', () => {
-      dummyStore.push({ user: 'user1', bookId: 10 });
+      memoryStore.push({ user: 'user1', bookId: 10 });
       return request(app.getHttpServer())
         .get('/favorites/1')
         .set('authorization', 'user1')
@@ -86,7 +86,7 @@ describe('AppController (e2e)', () => {
     });
 
     it('should only return favorite of the user', () => {
-      dummyStore.push({ user: 'user2', bookId: 10 });
+      memoryStore.push({ user: 'user2', bookId: 10 });
       return request(app.getHttpServer())
         .get('/favorites/10')
         .set('authorization', 'user1')
