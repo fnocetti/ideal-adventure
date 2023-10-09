@@ -9,20 +9,21 @@ import { DetailsField } from "@/components/bookDetails/DetailsField";
 import { AuthorsList } from "@/components/bookDetails/AuthorsList";
 import { FormatsList } from "@/components/bookDetails/FormatsList";
 import { useBook } from "@/hooks/useBook";
-import type { ParsedUrlQuery } from "querystring";
 import { getBookQuery } from "@/queries/books";
 import { AddToFavoritesButton } from "@/components/bookDetails/AddToFavoritesButton";
 import { useFavorites } from "@/hooks/useFavorites";
-
-function extractBookId(query: ParsedUrlQuery) {
-  return parseInt(query.id as string);
-}
+import { extractBookId } from "@/helpers/extractBookId";
+import { fetchFavorite } from "@/api/favoritesService";
 
 export const getServerSideProps = (async (context) => {
   const bookId = extractBookId(context.query);
   const queryClient = new QueryClient();
 
   await queryClient.prefetchQuery(getBookQuery(bookId));
+  await queryClient.prefetchQuery({
+    queryKey: ["isFavorite", bookId],
+    queryFn: async () => fetchFavorite(bookId),
+  });
 
   return {
     props: {
