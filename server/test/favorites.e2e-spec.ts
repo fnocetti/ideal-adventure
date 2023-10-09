@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from './../src/app.module';
+import { dummyStore } from './../src/favorites/favorites.controller';
 
 describe('AppController (e2e)', () => {
   let app: INestApplication;
@@ -16,13 +17,15 @@ describe('AppController (e2e)', () => {
   });
 
   describe('Add favorite', () => {
-    it('Add favorite', () => {
-      return request(app.getHttpServer())
+    it('should add a favorite', async () => {
+      await request(app.getHttpServer())
         .post('/favorites')
         .send({
           bookId: 1,
         })
         .expect(201);
+
+      expect(dummyStore).toEqual([{ bookId: 1 }]);
     });
   });
 });

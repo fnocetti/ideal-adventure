@@ -1,9 +1,14 @@
-import { Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 
+interface FavoriteDTO {
+  bookId: number;
+}
+
+export const dummyStore: FavoriteDTO[] = [];
 @Controller('favorites')
 export class FavoritesController {
   @Post()
-  async addFavorite() {
-    //
+  async addFavorite(@Body() favorite: FavoriteDTO) {
+    dummyStore.push(favorite);
   }
 }
