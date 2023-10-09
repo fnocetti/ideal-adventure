@@ -2,7 +2,10 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from './../src/app.module';
-import { dummyStore } from './../src/favorites/favorites.controller';
+import {
+  dummyStore,
+  resetDummyStore,
+} from './../src/favorites/favorites.controller';
 
 describe('AppController (e2e)', () => {
   let app: INestApplication;
@@ -14,6 +17,7 @@ describe('AppController (e2e)', () => {
 
     app = moduleFixture.createNestApplication();
     await app.init();
+    resetDummyStore();
   });
 
   describe('Add favorite', () => {
@@ -26,6 +30,17 @@ describe('AppController (e2e)', () => {
         .expect(201);
 
       expect(dummyStore).toEqual([{ bookId: 1 }]);
+    });
+  });
+
+  describe('Get favorite', () => {
+    it('should get a favorite by book id', async () => {
+      dummyStore.push({ bookId: 10 });
+      const response = await request(app.getHttpServer())
+        .get('/favorites/10')
+        .expect(200);
+
+      expect(response.body).toEqual(dummyStore[0]);
     });
   });
 });
