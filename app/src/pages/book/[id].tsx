@@ -14,15 +14,11 @@ import { AddToFavoritesButton } from "@/components/bookDetails/AddToFavoritesBut
 import { useFavorites } from "@/hooks/useFavorites";
 import { extractBookId } from "@/helpers/extractBookId";
 import { getIsFavoriteQueryForServer } from "@/queries/favorites";
-import { getCookie, setCookie } from "cookies-next";
+import { getOrCreateUserToken } from "@/helpers/session";
 
 export const getServerSideProps = (async ({ query, req, res }) => {
   const bookId = extractBookId(query);
-  let user = getCookie("session-cookie", { req, res });
-  if (!user) {
-    user = `${Math.random() * 10000}`;
-    setCookie("session-cookie", user, { req, res, httpOnly: true });
-  }
+  const user = getOrCreateUserToken(req, res);
   const queryClient = new QueryClient();
 
   await queryClient.prefetchQuery(getBookQuery(bookId));

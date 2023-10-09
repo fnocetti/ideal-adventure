@@ -1,16 +1,12 @@
 import { postAddToFavorites } from "@/api/favoritesService";
-import { getCookie, setCookie } from "cookies-next";
+import { getOrCreateUserToken } from "@/helpers/session";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === "POST") {
     const { bookId } = req.body;
     if (typeof bookId === "number") {
-      let user = getCookie("session-cookie", { req, res });
-      if (!user) {
-        user = `${Math.random() * 10000}`;
-        setCookie("session-cookie", user, { req, res, httpOnly: true });
-      }
+      const user = getOrCreateUserToken(req, res);
 
       postAddToFavorites(bookId, user).then((response) => {
         if (response.status === 201) {
