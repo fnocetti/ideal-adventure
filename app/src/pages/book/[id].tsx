@@ -1,4 +1,4 @@
-import { Box, Stack, Typography } from "@mui/material";
+import { Box, Button, Stack, Typography } from "@mui/material";
 import Head from "next/head";
 import type { GetServerSideProps } from "next/types";
 import { QueryClient, dehydrate } from "react-query";
@@ -11,6 +11,7 @@ import { FormatsList } from "@/components/bookDetails/FormatsList";
 import { useBook } from "@/hooks/useBook";
 import type { ParsedUrlQuery } from "querystring";
 import { getBookQuery } from "@/queries/books";
+import { AddToFavoritesButton } from "@/components/bookDetails/AddToFavoritesButton";
 
 function extractBookId(query: ParsedUrlQuery) {
   return parseInt(query.id as string);
@@ -50,13 +51,18 @@ export default function BookDetailsPage() {
           alignItems={{ xs: "center", md: "flex-start" }}
           spacing={2}
         >
-          <Box
-            component="img"
-            src={book.formats["image/jpeg"]}
-            sx={{
-              maxWidth: { xs: "80%", md: "38%" },
-            }}
-          />
+          <Stack
+            sx={{ maxWidth: { xs: "80%", md: "38%" } }}
+            spacing={2}
+            alignItems="center"
+          >
+            <AddToFavoritesButton
+              isAdding={true}
+              isFavorite={true}
+              onAdd={() => {}}
+            />
+            <Box component="img" src={book.formats["image/jpeg"]} />
+          </Stack>
           <Stack>
             <Stack
               direction="row"
