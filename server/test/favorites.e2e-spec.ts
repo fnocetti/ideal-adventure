@@ -21,15 +21,31 @@ describe('AppController (e2e)', () => {
   });
 
   describe('Add favorite', () => {
-    it('should add a favorite', async () => {
-      await request(app.getHttpServer())
-        .post('/favorites')
-        .send({
-          bookId: 1,
-        })
-        .expect(201);
+    describe('if the user does not provide a session token', () => {
+      it('should return a 401', async () => {
+        await request(app.getHttpServer())
+          .post('/favorites')
+          .send({
+            bookId: 1,
+          })
+          .expect(401);
 
-      expect(dummyStore).toEqual([{ bookId: 1 }]);
+        expect(dummyStore).toEqual([]);
+      });
+    });
+
+    describe('if the user provides a session token', () => {
+      it('should add a favorite for the user', async () => {
+        await request(app.getHttpServer())
+          .post('/favorites')
+          .set('authorization', 'user1')
+          .send({
+            bookId: 1,
+          })
+          .expect(201);
+
+        expect(dummyStore).toEqual([{ user: 'user1', bookId: 1 }]);
+      });
     });
 
     it.each([
@@ -52,17 +68,35 @@ describe('AppController (e2e)', () => {
 
   describe('Get favorite', () => {
     it('should get a favorite by book id', async () => {
-      dummyStore.push({ bookId: 10 });
+      dummyStore.push({ user: 'user1', bookId: 10 });
       const response = await request(app.getHttpServer())
         .get('/favorites/10')
+        .set('authorization', 'user1')
         .expect(200);
 
-      expect(response.body).toEqual(dummyStore[0]);
+      expect(response.body).toEqual({ bookId: 10 });
     });
 
     it('should return 404 if the favorite does not exist', () => {
-      dummyStore.push({ bookId: 10 });
-      return request(app.getHttpServer()).get('/favorites/1').expect(404);
+      dummyStore.push({ user: 'user1', bookId: 10 });
+      return request(app.getHttpServer())
+        .get('/favorites/1')
+        .set('authorization', 'user1')
+        .expect(404);
+    });
+
+    it('should only return favorite of the user', () => {
+      dummyStore.push({ user: 'user2', bookId: 10 });
+      return request(app.getHttpServer())
+        .get('/favorites/10')
+        .set('authorization', 'user1')
+        .expect(404);
+    });
+
+    describe('if the user does not provide a session token', () => {
+      it('should return 401', async () => {
+        await request(app.getHttpServer()).get('/favorites/1').expect(401);
+      });
     });
   });
 });

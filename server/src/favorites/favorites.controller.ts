@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Headers,
   HttpException,
   HttpStatus,
   Param,
@@ -10,27 +11,46 @@ import {
 } from '@nestjs/common';
 import { AddFavoriteDto } from './AddFavoriteDto';
 
-interface FavoriteDTO {
+interface FavoriteDBO {
+  user: string;
   bookId: number;
 }
 
-export let dummyStore: FavoriteDTO[] = [];
+export let dummyStore: FavoriteDBO[] = [];
 export function resetDummyStore() {
   dummyStore = [];
 }
 @Controller('favorites')
 export class FavoritesController {
   @Get(':bookId')
-  async getFavorite(@Param('bookId', ParseIntPipe) bookId: number) {
-    const favorite = dummyStore.find((f) => f.bookId === bookId);
+  async getFavorite(
+    @Param('bookId', ParseIntPipe) bookId: number,
+    @Headers('Authorization') token?: string,
+  ) {
+    if (typeof token === 'undefined') {
+      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+    }
+
+    const favorite = dummyStore.find(
+      (f) => f.user === token && f.bookId === bookId,
+    );
+
     if (!favorite) {
       throw new HttpException('Not found', HttpStatus.NOT_FOUND);
     }
-    return favorite;
+
+    return { bookId: favorite.bookId };
   }
 
   @Post()
-  async addFavorite(@Body() favorite: AddFavoriteDto) {
-    dummyStore.push(favorite);
+  async addFavorite(
+    @Body() favorite: AddFavoriteDto,
+    @Headers('Authorization') token?: string,
+  ) {
+    if (typeof token === 'undefined') {
+      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+    }
+
+    dummyStore.push({ ...favorite, user: token });
   }
 }
