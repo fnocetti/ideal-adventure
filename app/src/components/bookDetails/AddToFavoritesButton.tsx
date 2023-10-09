@@ -20,5 +20,5 @@ export function AddToFavoritesButton({
     return <CircularProgress />;
   }
 
-  return <Button>Add to favorites</Button>;
+  return <Button onClick={onAdd}>Add to favorites</Button>;
 }

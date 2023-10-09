@@ -1,7 +1,7 @@
 import { Box, Button, Stack, Typography } from "@mui/material";
 import Head from "next/head";
 import type { GetServerSideProps } from "next/types";
-import { QueryClient, dehydrate } from "react-query";
+import { QueryClient, dehydrate, useMutation } from "react-query";
 import { useRouter } from "next/router";
 import { AppLayout } from "@/components/AppLayout";
 import { SubjectsChips } from "@/components/bookDetails/SubjectsChips";
@@ -12,6 +12,7 @@ import { useBook } from "@/hooks/useBook";
 import type { ParsedUrlQuery } from "querystring";
 import { getBookQuery } from "@/queries/books";
 import { AddToFavoritesButton } from "@/components/bookDetails/AddToFavoritesButton";
+import axios from "axios";
 
 function extractBookId(query: ParsedUrlQuery) {
   return parseInt(query.id as string);
@@ -33,8 +34,17 @@ export const getServerSideProps = (async (context) => {
 export default function BookDetailsPage() {
   const router = useRouter();
   const { book } = useBook(extractBookId(router.query));
+  const addToFavoritesMutation = useMutation(
+    (newFavorite: { bookId: number }) => {
+      return axios.post("/api/favorites", newFavorite);
+    }
+  );
 
   if (!book) return "no data";
+
+  const addToFavorites = () => {
+    addToFavoritesMutation.mutate({ bookId: book.id });
+  };
 
   return (
     <>
@@ -57,9 +67,9 @@ export default function BookDetailsPage() {
             alignItems="center"
           >
             <AddToFavoritesButton
-              isAdding={true}
-              isFavorite={true}
-              onAdd={() => {}}
+              isAdding={addToFavoritesMutation.isLoading}
+              isFavorite={addToFavoritesMutation.isSuccess}
+              onAdd={addToFavorites}
             />
             <Box component="img" src={book.formats["image/jpeg"]} />
           </Stack>
