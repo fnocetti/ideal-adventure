@@ -17,4 +17,15 @@ export class FavoritesRepository {
     this.db.data.favorites.push({ user, bookId });
     await this.db.write();
   }
+
+  async delete(token: string, bookId: number) {
+    await this.db.read();
+    const filtered = this.db.data.favorites.filter(
+      (f) => !(f.user === token && f.bookId === bookId),
+    );
+    const didRemove = filtered.length < this.db.data.favorites.length;
+    this.db.data.favorites = filtered;
+    await this.db.write();
+    return didRemove;
+  }
 }

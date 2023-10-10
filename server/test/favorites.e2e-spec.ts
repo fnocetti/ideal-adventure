@@ -106,4 +106,40 @@ describe('AppController (e2e)', () => {
       });
     });
   });
+
+  describe('Delete a favorite', () => {
+    it('should delete a favorite by book id', async () => {
+      testingDb.data.favorites.push({ user: 'user1', bookId: 10 });
+      await request(app.getHttpServer())
+        .delete('/favorites/10')
+        .set('authorization', 'user1')
+        .expect(200);
+
+      expect(testingDb.data.favorites).toEqual([]);
+    });
+
+    it('should return 404 if the favorite does not exist', () => {
+      testingDb.data.favorites.push({ user: 'user1', bookId: 10 });
+      return request(app.getHttpServer())
+        .delete('/favorites/1')
+        .set('authorization', 'user1')
+        .expect(404);
+    });
+
+    it('should only delete favorites of the user', async () => {
+      testingDb.data.favorites.push({ user: 'user2', bookId: 10 });
+      await request(app.getHttpServer())
+        .delete('/favorites/10')
+        .set('authorization', 'user1')
+        .expect(404);
+
+      expect(testingDb.data.favorites).toEqual([{ user: 'user2', bookId: 10 }]);
+    });
+
+    describe('if the user does not provide a session token', () => {
+      it('should return 401', async () => {
+        await request(app.getHttpServer()).delete('/favorites/1').expect(401);
+      });
+    });
+  });
 });

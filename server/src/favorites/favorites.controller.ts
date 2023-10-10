@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpException,
   HttpStatus,
@@ -33,5 +34,16 @@ export class FavoritesController {
   @Post()
   async addFavorite(@Body() favorite: AddFavoriteDto, @User() token?: string) {
     await this.favorites.save(token, favorite.bookId);
+  }
+
+  @Delete(':bookId')
+  async deleteFavorite(
+    @Param('bookId', ParseIntPipe) bookId: number,
+    @User() token: string,
+  ) {
+    const removed = await this.favorites.delete(token, bookId);
+    if (!removed) {
+      throw new HttpException('Not found', HttpStatus.NOT_FOUND);
+    }
   }
 }
