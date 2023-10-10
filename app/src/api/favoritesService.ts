@@ -1,10 +1,11 @@
 import axios from "axios";
 
-const FAVORITES_SERVICE = "http://localhost:3004/favorites";
+const FAVORITES_SERVICE =
+  process.env.FAVORITES_SERVICE ?? "http://localhost:3004";
 
 export function postAddToFavorites(bookId: number, userToken: string) {
   return axios.post(
-    FAVORITES_SERVICE,
+    `${FAVORITES_SERVICE}/favorites`,
     { bookId },
     {
       headers: {
@@ -17,7 +18,7 @@ export function postAddToFavorites(bookId: number, userToken: string) {
 export async function fetchFavorite(bookId: number, userToken: string) {
   return new Promise<boolean>((resolve, reject) => {
     axios
-      .get(`${FAVORITES_SERVICE}/${bookId}`, {
+      .get(`${FAVORITES_SERVICE}/favorites/${bookId}`, {
         headers: {
           Authorization: userToken,
         },
