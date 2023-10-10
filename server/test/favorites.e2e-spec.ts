@@ -1,23 +1,27 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
-import * as request from 'supertest';
 import { AppModule } from './../src/app.module';
-import {
-  memoryStore,
-  resetMemoryStoreStore,
-} from './../src/favorites/favorites-repository/favorites-repository';
+import { Db } from './../src/database/db/db.interface';
+import { TestingDb } from './../src/database/testing-db/testing-db';
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const request = require('supertest');
 
 describe('AppController (e2e)', () => {
   let app: INestApplication;
+  const testingDb = new TestingDb();
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
-    }).compile();
+    })
+      .overrideProvider(Db)
+      .useValue(testingDb)
+      .compile();
 
     app = moduleFixture.createNestApplication();
     await app.init();
-    resetMemoryStoreStore();
+    testingDb.reset();
   });
 
   describe('Add favorite', () => {
@@ -30,7 +34,7 @@ describe('AppController (e2e)', () => {
           })
           .expect(401);
 
-        expect(memoryStore).toEqual([]);
+        expect(testingDb.data.favorites).toEqual([]);
       });
     });
 
@@ -44,7 +48,9 @@ describe('AppController (e2e)', () => {
           })
           .expect(201);
 
-        expect(memoryStore).toEqual([{ user: 'user1', bookId: 1 }]);
+        expect(testingDb.data.favorites).toEqual([
+          { user: 'user1', bookId: 1 },
+        ]);
       });
     });
 
@@ -62,14 +68,14 @@ describe('AppController (e2e)', () => {
           })
           .expect(400);
 
-        expect(memoryStore).toEqual([]);
+        expect(testingDb.data.favorites).toEqual([]);
       },
     );
   });
 
   describe('Get favorite', () => {
     it('should get a favorite by book id', async () => {
-      memoryStore.push({ user: 'user1', bookId: 10 });
+      testingDb.data.favorites.push({ user: 'user1', bookId: 10 });
       const response = await request(app.getHttpServer())
         .get('/favorites/10')
         .set('authorization', 'user1')
@@ -79,7 +85,7 @@ describe('AppController (e2e)', () => {
     });
 
     it('should return 404 if the favorite does not exist', () => {
-      memoryStore.push({ user: 'user1', bookId: 10 });
+      testingDb.data.favorites.push({ user: 'user1', bookId: 10 });
       return request(app.getHttpServer())
         .get('/favorites/1')
         .set('authorization', 'user1')
@@ -87,7 +93,7 @@ describe('AppController (e2e)', () => {
     });
 
     it('should only return favorite of the user', () => {
-      memoryStore.push({ user: 'user2', bookId: 10 });
+      testingDb.data.favorites.push({ user: 'user2', bookId: 10 });
       return request(app.getHttpServer())
         .get('/favorites/10')
         .set('authorization', 'user1')

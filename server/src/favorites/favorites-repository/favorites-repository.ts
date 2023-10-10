@@ -1,21 +1,20 @@
-import { Injectable } from '@nestjs/common';
-
-interface FavoriteDBO {
-  user: string;
-  bookId: number;
-}
-export let memoryStore: FavoriteDBO[] = [];
-export function resetMemoryStoreStore() {
-  memoryStore = [];
-}
+import { Inject, Injectable } from '@nestjs/common';
+import { Db } from './../../database/db/db.interface';
 
 @Injectable()
 export class FavoritesRepository {
-  find(user: string, bookId: number) {
-    return memoryStore.find((f) => f.user === user && f.bookId === bookId);
+  constructor(@Inject(Db) private db: Db) {}
+
+  async find(user: string, bookId: number) {
+    await this.db.read();
+    return this.db.data.favorites.find(
+      (f) => f.user === user && f.bookId === bookId,
+    );
   }
 
-  save(user: string, bookId: number) {
-    memoryStore.push({ user, bookId });
+  async save(user: string, bookId: number) {
+    await this.db.read();
+    this.db.data.favorites.push({ user, bookId });
+    await this.db.write();
   }
 }

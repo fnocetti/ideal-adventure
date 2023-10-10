@@ -21,7 +21,7 @@ export class FavoritesController {
     @Param('bookId', ParseIntPipe) bookId: number,
     @User() token: string,
   ) {
-    const favorite = this.favorites.find(token, bookId);
+    const favorite = await this.favorites.find(token, bookId);
 
     if (!favorite) {
       throw new HttpException('Not found', HttpStatus.NOT_FOUND);
@@ -32,6 +32,6 @@ export class FavoritesController {
 
   @Post()
   async addFavorite(@Body() favorite: AddFavoriteDto, @User() token?: string) {
-    this.favorites.save(token, favorite.bookId);
+    await this.favorites.save(token, favorite.bookId);
   }
 }
