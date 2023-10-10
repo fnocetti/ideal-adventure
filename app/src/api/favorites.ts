@@ -8,6 +8,10 @@ export function addToFavorites(bookId: number) {
   return axios.post("/api/favorites", { bookId });
 }
 
+export function removeFromFavorites(bookId: number) {
+  return axios.delete(`/api/favorites/${bookId}`);
+}
+
 export async function isFavorite(bookId: number) {
   const {
     data: { isFavorite },

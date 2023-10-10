@@ -3,20 +3,26 @@ import StarIcon from "@mui/icons-material/Star";
 
 interface AddToFavoritesButtonProps {
   onAdd: () => void;
-  isAdding: boolean;
+  onRemove: () => void;
+  isLoading: boolean;
   isFavorite: boolean;
 }
 
 export function AddToFavoritesButton({
   onAdd,
-  isAdding,
+  onRemove,
+  isLoading,
   isFavorite,
 }: AddToFavoritesButtonProps) {
   if (isFavorite) {
-    return <StarIcon fontSize="large" />;
+    return (
+      <Button onClick={onRemove}>
+        <StarIcon fontSize="medium" />
+      </Button>
+    );
   }
 
-  if (isAdding) {
+  if (isLoading) {
     return <CircularProgress />;
   }
 

@@ -35,3 +35,11 @@ export async function fetchFavorite(bookId: number, userToken: string) {
       });
   });
 }
+
+export async function deleteFavorite(bookId: number, userToken: string) {
+  return axios.delete(`${FAVORITES_SERVICE}/favorites/${bookId}`, {
+    headers: {
+      Authorization: userToken,
+    },
+  });
+}

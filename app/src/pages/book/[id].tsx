@@ -34,9 +34,8 @@ export const getServerSideProps = (async ({ query, req, res }) => {
 export default function BookDetailsPage() {
   const router = useRouter();
   const { book } = useBook(extractBookId(router.query));
-  const { isFavorite, isAddingToFavorites, addToFavorites } = useFavorites(
-    extractBookId(router.query)
-  );
+  const { isFavorite, isLoading, addToFavorites, removeFromFavorites } =
+    useFavorites(extractBookId(router.query));
 
   if (!book) return "no data";
 
@@ -61,9 +60,10 @@ export default function BookDetailsPage() {
             alignItems="center"
           >
             <AddToFavoritesButton
-              isAdding={isAddingToFavorites}
+              isLoading={isLoading}
               isFavorite={isFavorite}
               onAdd={addToFavorites}
+              onRemove={removeFromFavorites}
             />
             <Box component="img" src={book.formats["image/jpeg"]} />
           </Stack>

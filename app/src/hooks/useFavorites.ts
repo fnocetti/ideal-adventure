@@ -1,10 +1,14 @@
-import { addToFavorites } from "@/api/favorites";
+import { addToFavorites, removeFromFavorites } from "@/api/favorites";
 import { getIsFavoriteQueryForClient } from "@/queries/favorites";
 import { useMutation, useQuery } from "react-query";
 
 export function useFavorites(bookId: number) {
-  const mutation = useMutation((id: number) => {
+  const addMutation = useMutation((id: number) => {
     return addToFavorites(id);
+  });
+
+  const removeMutation = useMutation((id: number) => {
+    return removeFromFavorites(id);
   });
 
   const { data: isFavoriteResult } = useQuery(
@@ -12,8 +16,16 @@ export function useFavorites(bookId: number) {
   );
 
   return {
-    addToFavorites: () => mutation.mutate(bookId),
-    isFavorite: isFavoriteResult || mutation.isSuccess,
-    isAddingToFavorites: mutation.isLoading,
+    addToFavorites: () => {
+      removeMutation.reset();
+      addMutation.mutate(bookId);
+    },
+    removeFromFavorites: () => {
+      addMutation.reset();
+      removeMutation.mutate(bookId);
+    },
+    isFavorite:
+      (isFavoriteResult && !removeMutation.isSuccess) || addMutation.isSuccess,
+    isLoading: addMutation.isLoading || removeMutation.isLoading,
   };
 }
