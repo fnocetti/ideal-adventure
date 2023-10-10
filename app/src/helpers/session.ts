@@ -1,9 +1,10 @@
 import { getCookie, setCookie } from "cookies-next";
 import { DefaultOptions } from "cookies-next/lib/types";
+import { randomUUID } from "crypto";
 import { NextApiRequest, NextApiResponse } from "next";
 
 function createUser() {
-  return `${Math.random() * 10000}`;
+  return randomUUID();
 }
 
 export function getOrCreateUserToken(
