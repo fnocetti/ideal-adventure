@@ -11,7 +11,7 @@ export function AppLayout({ children }: AppLayoutProps) {
       <AppBar position="relative">
         <Toolbar>
           <LocalLibraryIcon sx={{ mr: 2 }} />
-          <Typography variant="h5"> GutendexApp</Typography>
+          <Typography variant="h5"> Bookshop</Typography>
         </Toolbar>
       </AppBar>
       <Box component="main" sx={{ py: 4 }}>
