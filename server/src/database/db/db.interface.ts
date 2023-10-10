@@ -1,6 +1,6 @@
 import { FavoriteDBO } from '../dbo/favorite.dbo';
 
-interface Data {
+export interface Data {
   favorites: FavoriteDBO[];
 }
 

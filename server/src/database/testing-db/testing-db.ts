@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Db } from '../db/db.interface';
+import { DEFAULT_DATA } from '../default-data';
 
 @Injectable()
 export class TestingDb implements Db {
@@ -18,6 +19,6 @@ export class TestingDb implements Db {
   }
 
   reset() {
-    this.data = { favorites: [] };
+    this.data = JSON.parse(JSON.stringify(DEFAULT_DATA));
   }
 }
